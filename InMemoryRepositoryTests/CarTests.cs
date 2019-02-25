@@ -1,0 +1,93 @@
+using System.Linq;
+using System;
+using System.Collections.Generic;
+using InMemoryRepositoryTests;
+using NUnit.Framework;
+using Interview;
+
+namespace Interview
+{
+    [TestFixture]
+    public class CarInMemoryTests
+    {
+        [Test]
+        public void Add_RepoContains1Car_CarAddedToRepo()
+        {
+            var testObject = new CarTestableObject();
+
+            testObject.InMemoryCarRepository.Save(testObject.CarBMW);
+            
+            Assert.AreEqual(testObject.CarBMW, testObject.InMemoryCarRepository.FindById(testObject.CarBMW.Id));
+        }
+
+        [Test]
+        public void GetAll_Add2CarsToRepo_RepoAllReturn2Cars()
+        {
+            var testObject = new CarTestableObject();
+            
+            testObject.InMemoryCarRepository.Save(testObject.CarBMW);
+            testObject.InMemoryCarRepository.Save(testObject.CarMG);
+            
+            Assert.AreEqual(2, testObject.InMemoryCarRepository.All().Count());
+            Assert.AreEqual(testObject.CarBMW, testObject.InMemoryCarRepository.FindById(testObject.CarBMW.Id));
+            Assert.AreEqual(testObject.CarMG, testObject.InMemoryCarRepository.FindById(testObject.CarMG.Id));
+        }
+        
+        [Test]
+        public void Find_RepoContainsAddedCar_AddedCarReturned()
+        {
+            var testObject = new CarTestableObject();
+            testObject.InMemoryCarRepository.Save(testObject.CarBMW);
+            testObject.InMemoryCarRepository.Save(testObject.CarMG);
+            
+            var targetElement = testObject.InMemoryCarRepository.FindById(testObject.CarBMW.Id);
+            var emptyElement = testObject.InMemoryCarRepository.FindById(Guid.Empty);
+
+            Assert.NotNull(targetElement);
+            Assert.IsNull(emptyElement);
+        }
+
+        [Test]
+        public void Update_RepoContainsUpdateCar_UpdatedCarReturned()
+        {
+            var testObject = new CarTestableObject();
+            testObject.InMemoryCarRepository.Save(testObject.CarBMW);
+            testObject.InMemoryCarRepository.Save(testObject.CarMG);
+            
+            var targetElement = testObject.InMemoryCarRepository.FindById(testObject.CarBMW.Id);
+            var NameOfNewCar = "LADA";
+            targetElement.Name = NameOfNewCar;
+            testObject.InMemoryCarRepository.Save(targetElement);
+
+            Assert.AreEqual(NameOfNewCar, testObject.InMemoryCarRepository.FindById(testObject.CarBMW.Id).Name);
+        }
+
+
+        [Test]
+        public void Delete_RepoNotContainsAddedCar_TargetCarRemoved()
+        {
+            var testObject = new CarTestableObject();
+            testObject.InMemoryCarRepository.Save(testObject.CarBMW);
+            testObject.InMemoryCarRepository.Save(testObject.CarMG);
+
+            testObject.InMemoryCarRepository.Delete(testObject.CarBMW.CarId);
+            
+            Assert.IsNull(testObject.InMemoryCarRepository.FindById(testObject.CarBMW.Id));
+            Assert.AreEqual(1, testObject.InMemoryCarRepository.All().Count());
+        }
+    }
+
+    class CarTestableObject
+    {
+        public InMemoryRepository<Car> InMemoryCarRepository { get; set; }
+        public Car CarBMW { get; set; }
+        public Car CarMG { get; set; }
+
+        public CarTestableObject()
+        {
+            InMemoryCarRepository = new InMemoryRepository<Car>();
+            CarBMW = new Car { CarId = Guid.NewGuid(), Name = "BMW", HP = 100 };
+            CarMG = new Car { CarId = Guid.NewGuid(), Name = "MG", HP = 110 };
+        }
+    }
+}
