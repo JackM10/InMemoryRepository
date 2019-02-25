@@ -9,29 +9,29 @@ namespace Interview
 {
     public class InMemoryRepository<T> : IRepository<T> where T : IStoreable
     {
-        private ConcurrentDictionary<IComparable, T> ConcurrentInternalStorage = new ConcurrentDictionary<IComparable, T>();
+        private List<T> internalStorage = new List<T>();
 
         public IEnumerable<T> All()
         {
-            return ConcurrentInternalStorage.Values;
+            return internalStorage.AsEnumerable();
         }
 
         public void Delete(IComparable id)
         {
-            ConcurrentInternalStorage.TryRemove(id, out _);
+            var itemToDelete = internalStorage.Find(item => item.Id.CompareTo(id) == 0);
+            if (itemToDelete != null)
+                internalStorage.Remove(itemToDelete);
         }
 
         public T FindById(IComparable id)
         {
-            T value;
-            ConcurrentInternalStorage.TryGetValue(id, out value);
-
-            return value;
+            return internalStorage.Find(item => item.Id.CompareTo(id) == 0);
         }
 
         public void Save(T item)
         {
-            ConcurrentInternalStorage.TryAdd(item.Id, item);
+            if (internalStorage.Contains(item)) return;
+            internalStorage.Add(item);
         }
     }
 }
