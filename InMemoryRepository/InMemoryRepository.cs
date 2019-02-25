@@ -23,8 +23,7 @@ namespace Interview
 
         public T FindById(IComparable id)
         {
-            T value;
-            ConcurrentInternalStorage.TryGetValue(id, out value);
+            ConcurrentInternalStorage.TryGetValue(id, out var value);
 
             return value;
         }
