@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
 using InMemoryRepositoryTests;
@@ -14,6 +15,7 @@ namespace InMemoryRepository.Tests
         private const double ADD_OP_PERFORMING_TIME_LIMIT = 500;
         private const int DELETE_OP_PERFORMING_TIME_LIMIT = 600;
         private const int FIND_OP_PERFORMING_TIME_LIMIT = 600;
+        private const int MIXED_OP_PERFORMING_TIME_LIMIT = 14000;
 
         [Test]
         public void PerformaceBenchmark_AddOperation()
@@ -39,6 +41,14 @@ namespace InMemoryRepository.Tests
             Assert.True(timeSpendonPerformingOperation < DELETE_OP_PERFORMING_TIME_LIMIT);
         }
 
+        [Test]
+        public void PerformaceBenchmark_StressTest_MixedOperation()
+        {
+            var timeSpendonPerformingOperation = BenchmarkRunner.Run<PerformanceTests>().Reports[3].ResultStatistics.Mean;
+
+            Assert.True(timeSpendonPerformingOperation < MIXED_OP_PERFORMING_TIME_LIMIT);
+        }
+
         [Benchmark]
         public void PerformAddOperation()
         {
@@ -59,6 +69,24 @@ namespace InMemoryRepository.Tests
 
         [Benchmark]
         public void PerformDeleteOperation()
+        {
+            var testObject = new PersonTestableObject();
+            testObject.InMemoryCarRepository.Save(testObject.PersonJack);
+            testObject.InMemoryCarRepository.Save(testObject.PersonRobert);
+
+            testObject.InMemoryCarRepository.Delete(testObject.PersonJack.Id);
+        }
+
+        [Benchmark]
+        public void PerformMixedOperations()
+        {
+            Parallel.For(0, Environment.ProcessorCount, i =>
+            {
+                Task.Run(() => CRUDmix()).Wait();
+            });
+        }
+
+        private void CRUDmix()
         {
             var testObject = new PersonTestableObject();
             testObject.InMemoryCarRepository.Save(testObject.PersonJack);
