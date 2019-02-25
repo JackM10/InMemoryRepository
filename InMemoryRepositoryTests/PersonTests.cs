@@ -74,6 +74,21 @@ namespace Interview
             Assert.IsNull(testObject.InMemoryCarRepository.FindById(testObject.PersonJack.Id));
             Assert.AreEqual(1, testObject.InMemoryCarRepository.All().Count());
         }
+
+        [Test]
+        public void Update_RepoDoesntContainsPersonWithSameId_OldValueUpdated()
+        {
+            InMemoryRepository<Person> InMemoryCarRepository = new InMemoryRepository<Person>();
+            var commonId = "user#0";
+            var PersonJack = new Person { PersonId = commonId, FirstName = "Jack", LastName = "Poladich", Age = 29 };
+            var PersonRobert = new Person { PersonId = commonId, FirstName = "Robert", LastName = "Martin", Age = 53 };
+
+            InMemoryCarRepository.Save(PersonJack);
+            InMemoryCarRepository.Save(PersonRobert);
+
+            Assert.AreEqual("Robert", InMemoryCarRepository.FindById(commonId)?.FirstName);
+            Assert.AreEqual(PersonRobert.Id, InMemoryCarRepository.FindById(commonId)?.Id);
+        }
     }
 
     class PersonTestableObject

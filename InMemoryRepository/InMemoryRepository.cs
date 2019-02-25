@@ -31,7 +31,14 @@ namespace Interview
 
         public void Save(T item)
         {
-            ConcurrentInternalStorage.TryAdd(item.Id, item);
+            if (ConcurrentInternalStorage.ContainsKey(item.Id)) // for highConcurrency replace with AddOrUpdate()
+            {
+                T value;
+                ConcurrentInternalStorage.TryGetValue(item.Id, out value);
+                ConcurrentInternalStorage.TryUpdate(item.Id, item, value);
+            }
+            else
+                ConcurrentInternalStorage.TryAdd(item.Id, item);
         }
     }
 }
