@@ -5,7 +5,7 @@ using InMemoryRepositoryTests;
 using NUnit.Framework;
 using Interview;
 
-namespace Interview
+namespace InMemoryRepository.Tests
 {
     [TestFixture]
     public class CarInMemoryTests
