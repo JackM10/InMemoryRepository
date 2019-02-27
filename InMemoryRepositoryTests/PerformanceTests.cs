@@ -15,7 +15,7 @@ namespace InMemoryRepository.Tests
         #region consts
 
         private const int ADD_OP_PERFORMING_TIME_LIMIT = 500;
-        private const int UPDATE_OP_PERFORMING_TIME_LIMIT = 500;
+        private const int UPDATE_OP_PERFORMING_TIME_LIMIT = 1100;
         private const int DELETE_OP_PERFORMING_TIME_LIMIT = 600;
         private const int FIND_OP_PERFORMING_TIME_LIMIT = 600;
         private const int MIXED_OP_PERFORMING_TIME_LIMIT = 14000;
@@ -24,44 +24,53 @@ namespace InMemoryRepository.Tests
 
         #region Tests
 
+        private static double AddOperationResults = double.MaxValue;
+        private static double UpdateOperationResults = double.MaxValue;
+        private static double FindOperationResults = double.MaxValue;
+        private static double DeleteOperationResults = double.MaxValue;
+        private static double MixedOperationResults = double.MaxValue;
+
+        [Test, Order(1)]
+        public void PerformaceBenchmark_BenchmarkRunner()
+        {
+            var benchmarkResults = BenchmarkRunner.Run<PerformanceTests>();
+            AddOperationResults = benchmarkResults.Reports[0].ResultStatistics.Mean;
+            UpdateOperationResults = benchmarkResults.Reports[1].ResultStatistics.Mean;
+            FindOperationResults = benchmarkResults.Reports[2].ResultStatistics.Mean;
+            DeleteOperationResults = benchmarkResults.Reports[3].ResultStatistics.Mean;
+            MixedOperationResults = benchmarkResults.Reports[4].ResultStatistics.Mean;
+
+            Assert.True(!benchmarkResults.HasCriticalValidationErrors);
+        }
+
         [Test]
         public void PerformaceBenchmark_AddOperation()
         {
-            var timeSpendonPerformingOperation = BenchmarkRunner.Run<PerformanceTests>().Reports[0].ResultStatistics.Mean;
-
-            Assert.True(timeSpendonPerformingOperation < ADD_OP_PERFORMING_TIME_LIMIT);
+            Assert.True(AddOperationResults < ADD_OP_PERFORMING_TIME_LIMIT);
         }
 
         [Test]
         public void PerformaceBenchmark_UpdateOperation()
         {
-            var timeSpendonPerformingOperation = BenchmarkRunner.Run<PerformanceTests>().Reports[1].ResultStatistics.Mean;
-
-            Assert.True(timeSpendonPerformingOperation < UPDATE_OP_PERFORMING_TIME_LIMIT);
+            Assert.True(UpdateOperationResults < UPDATE_OP_PERFORMING_TIME_LIMIT);
         }
 
         [Test]
         public void PerformaceBenchmark_FindOperation()
         {
-            var timeSpendonPerformingOperation = BenchmarkRunner.Run<PerformanceTests>().Reports[2].ResultStatistics.Mean;
-
-            Assert.True(timeSpendonPerformingOperation < FIND_OP_PERFORMING_TIME_LIMIT);
+            Assert.True(FindOperationResults < FIND_OP_PERFORMING_TIME_LIMIT);
         }
 
         [Test]
         public void PerformaceBenchmark_DeleteOperation()
         {
-            var timeSpendonPerformingOperation = BenchmarkRunner.Run<PerformanceTests>().Reports[3].ResultStatistics.Mean;
-
-            Assert.True(timeSpendonPerformingOperation < DELETE_OP_PERFORMING_TIME_LIMIT);
+            Assert.True(DeleteOperationResults < DELETE_OP_PERFORMING_TIME_LIMIT);
         }
 
         [Test]
         public void PerformaceBenchmark_StressTest_MixedOperation()
         {
-            var timeSpendonPerformingOperation = BenchmarkRunner.Run<PerformanceTests>().Reports[4].ResultStatistics.Mean;
-
-            Assert.True(timeSpendonPerformingOperation < MIXED_OP_PERFORMING_TIME_LIMIT);
+            Assert.True(MixedOperationResults < MIXED_OP_PERFORMING_TIME_LIMIT);
         }
 
         #endregion
