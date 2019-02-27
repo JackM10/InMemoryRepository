@@ -44,7 +44,7 @@ namespace InMemoryRepository.Tests
             var emptyElement = testObject.InMemoryCarRepository.FindById(Guid.Empty);
 
             Assert.NotNull(targetElement);
-            Assert.IsNull(emptyElement);
+            Assert.AreEqual(new Car(),emptyElement);
         }
 
         [Test]
@@ -72,7 +72,7 @@ namespace InMemoryRepository.Tests
 
             testObject.InMemoryCarRepository.Delete(testObject.CarBMW.CarId);
             
-            Assert.IsNull(testObject.InMemoryCarRepository.FindById(testObject.CarBMW.Id));
+            Assert.AreEqual(new Car(), testObject.InMemoryCarRepository.FindById(testObject.CarBMW.Id));
             Assert.AreEqual(1, testObject.InMemoryCarRepository.All().Count());
         }
 
@@ -87,8 +87,8 @@ namespace InMemoryRepository.Tests
             InMemoryCarRepository.Save(CarBMW);
             InMemoryCarRepository.Save(CarMG);
 
-            Assert.AreEqual("MG", InMemoryCarRepository.FindById(commonId)?.Name);
-            Assert.AreEqual(CarMG.Id, InMemoryCarRepository.FindById(commonId)?.Id);
+            Assert.AreEqual("MG", InMemoryCarRepository.FindById(commonId).Name);
+            Assert.AreEqual(CarMG.Id, InMemoryCarRepository.FindById(commonId).Id);
         }
     }
 

@@ -5,7 +5,7 @@ using Interview;
 
 namespace InMemoryRepositoryTests
 {
-    public class Person : IStoreable
+    public struct Person : IStoreable
     {
         public string PersonId { get; set; }
         public string FirstName { get; set; }
